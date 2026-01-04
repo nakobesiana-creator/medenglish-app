@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedEnglish Pro - Dashboard Progresso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        
+        .progress-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 8;
+        }
+        
+        .progress-ring .bg {
+            stroke: #e0e0e0;
+        }
+        
+        .progress-ring .progress {
+            stroke: #4CAF50;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .skill-progress {
+            margin-bottom: 20px;
+        }
+        
+        .skill-name {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .skill-bar {
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .skill-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.8s ease;
+        }
+        
+        .grammar-fill { background: linear-gradient(90deg, #FF6B6B, #FF8E53); }
+        .vocabulary-fill { background: linear-gradient(90deg, #4ECDC4, #44A08D); }
+        .reading-fill { background: linear-gradient(90deg, #45B7D1, #96C93D); }
+        .writing-fill { background: linear-gradient(90deg, #F093FB, #F5576C); }
+        .listening-fill { background: linear-gradient(90deg, #4FACFE, #00F2FE); }
+        
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .achievement {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .achievement:hover {
+            transform: translateY(-5px);
+        }
+        
+        .achievement.earned {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .achievement.locked {
+            opacity: 0.5;
+            background: #f8f9fa;
+        }
+        
+        .achievement-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .achievement-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .study-calendar {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-day.empty {
+            background: #f8f9fa;
+            color: #ccc;
+        }
+        
+        .calendar-day.studied {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .calendar-day.today {
+            background: #007bff;
+            color: white;
+            box-shadow: 0 0 10px rgba(0,123,255,0.5);
+        }
+        
+        .calendar-day.missed {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .recommendations {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .recommendation-item {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .recommendation-item.urgent {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .recommendation-item.success {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+        
+        .level-progression {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .level-path {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .level-path::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .level-node {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        
+        .level-node.completed {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .level-node.current {
+            background: #007bff;
+            color: white;
+            box-shadow: 0 0 20px rgba(0,123,255,0.5);
+        }
+        
+        .level-node.locked {
+            background: #e0e0e0;
+            color: #999;
+        }
+        
+        .export-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .level-path {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .level-path::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>📊 Dashboard Progresso</h1>
+            <p>Monitora il tuo percorso verso la padronanza dell'inglese medico</p>
+            <div style="margin-top: 20px;">
+                <a href="english_learning_app.html" style="color: white; text-decoration: none; margin: 0 15px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
+                    📚 Torna alle Lezioni
+                </a>
+                <a href="index.html" style="color: white; text-decoration: none; margin: 0 15px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 20px;">
+                    🏠 Menu Principale
+                </a>
+            </div>
+        </div>
+        
+        <!-- Statistiche Principali -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="progress-ring">
+                    <svg>
+                        <circle class="bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="progress" cx="60" cy="60" r="52" id="overallProgressRing"></circle>
+                    </svg>
+                    <div class="progress-text" id="overallProgressText">65%</div>
+                </div>
+                <div class="stat-label">Progresso Complessivo</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="currentStreak">12</div>
+                <div class="stat-label">Giorni Consecutivi</div>
+                <div style="color: #4CAF50; font-weight: bold;">🔥 In fiamme!</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="totalWords">847</div>
+                <div class="stat-label">Parole Apprese</div>
+                <div style="color: #007bff;">📚 Vocabolario in crescita</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="totalHours">23.5</div>
+                <div class="stat-label">Ore di Studio</div>
+                <div style="color: #6f42c1;">⏱️ Tempo investito</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="currentLevel">B1</div>
+                <div class="stat-label">Livello Attuale</div>
+                <div style="color: #fd7e14;">🎯 Prossimo: B2</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="totalPoints">2,340</div>
+                <div class="stat-label">Punti Totali</div>
+                <div style="color: #20c997;">💎 Esperienza guadagnata</div>
+            </div>
+        </div>
+        
+        <!-- Grafici e Analisi -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-title">📈 Progresso per Competenza</div>
+                
+                <div class="skill-progress">
+                    <div class="skill-name">
+                        <span>📝 Grammatica</span>
+                        <span>78%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-fill grammar-fill" style="width: 78%;"></div>
+                    </div>
+                </div>
+                
+                <div class="skill-progress">
+                    <div class="skill-name">
+                        <span>🔬 Vocabolario Medico</span>
+                        <span>85%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-fill vocabulary-fill" style="width: 85%;"></div>
+                    </div>
+                </div>
+                
+                <div class="skill-progress">
+                    <div class="skill-name">
+                        <span>📖 Reading Scientifico</span>
+                        <span>72%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-fill reading-fill" style="width: 72%;"></div>
+                    </div>
+                </div>
+                
+                <div class="skill-progress">
+                    <div class="skill-name">
+                        <span>✍️ Writing Accademico</span>
+                        <span>65%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-fill writing-fill" style="width: 65%;"></div>
+                    </div>
+                </div>
+                
+                <div class="skill-progress">
+                    <div class="skill-name">
+                        <span>🎧 Listening Medico</span>
+                        <span>70%</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-fill listening-fill" style="width: 70%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-title">🏆 Achievements</div>
+                <div class="achievements-grid">
+                    <div class="achievement earned">
+                        <div class="achievement-icon">🎯</div>
+                        <div class="achievement-name">First Steps</div>
+                        <div class="achievement-desc">Prima lezione completata</div>
+                    </div>
+                    
+                    <div class="achievement earned">
+                        <div class="achievement-icon">🔥</div>
+                        <div class="achievement-name">Week Warrior</div>
+                        <div class="achievement-desc">7 giorni consecutivi</div>
+                    </div>
+                    
+                    <div class="achievement earned">
+                        <div class="achievement-icon">📚</div>
+                        <div class="achievement-name">Vocab Master</div>
+                        <div class="achievement-desc">500 parole apprese</div>
+                    </div>
+                    
+                    <div class="achievement locked">
+                        <div class="achievement-icon">✍️</div>
+                        <div class="achievement-name">Writing Pro</div>
+                        <div class="achievement-desc">10 saggi perfetti</div>
+                    </div>
+                    
+                    <div class="achievement locked">
+                        <div class="achievement-icon">⬆️</div>
+                        <div class="achievement-name">Level Up!</div>
+                        <div class="achievement-desc">Raggiungi B2</div>
+                    </div>
+                    
+                    <div class="achievement locked">
+                        <div class="achievement-icon">👑</div>
+                        <div class="achievement-name">Medical Expert</div>
+                        <div class="achievement-desc">Raggiungi C2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progressione Livelli -->
+        <div class="level-progression">
+            <div class="chart-title">🎓 Percorso di Apprendimento</div>
+            <div class="level-path">
+                <div class="level-node completed">A2</div>
+                <div class="level-node current">B1</div>
+                <div class="level-node locked">B2</div>
+                <div class="level-node locked">C1</div>
+                <div class="level-node locked">C2</div>
+            </div>
+            <div class="level-progression-footer">
+                <button class="btn" onclick="window.location.href='english_learning_app.html'">⬅️ Torna alle Lezioni</button>
+            </div>
+        </div>
+        
+        <!-- Calendario Studio -->
+        <div class="study-calendar">
+            <div class="chart-title">📅 Calendario di Studio - Dicembre 2025</div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span style="color: #4CAF50;">● Studiato</span>
+                <span style="color: #007bff;">● Oggi</span>
+                <span style="color: #dc3545;">● Mancato</span>
+                <span style="color: #ccc;">● Non programmato</span>
+            </div>
+            <div class="calendar-grid" id="studyCalendar">
+                <!-- Generato dinamicamente -->
+            </div>
+        </div>
+        
+        <!-- Raccomandazioni Personalizzate -->
+        <div class="recommendations">
+            <div class="chart-title">💡 Raccomandazioni Personalizzate</div>
+            
+            <div class="recommendation-item success">
+                <strong>🎉 Ottimo lavoro!</strong><br>
+                Il tuo vocabolario medico è in crescita costante. Continua così!
+            </div>
+            
+            <div class="recommendation-item urgent">
+                <strong>⚠️ Area di miglioramento:</strong><br>
+                Il writing accademico necessita più pratica. Dedica 15 minuti extra al giorno.
+            </div>
+            
+            <div class="recommendation-item">
+                <strong>📖 Suggerimento di lettura:</strong><br>
+                Leggi almeno un abstract di PubMed al giorno per migliorare il reading scientifico.
+            </div>
+            
+            <div class="recommendation-item">
+                <strong>🎯 Obiettivo settimanale:</strong><br>
+                Completa 5 esercizi di grammatica avanzata per consolidare le strutture B1.
+            </div>
+        </div>
+        
+        <!-- Esportazione Dati -->
+        <div class="export-section">
+            <h3>📊 Esporta i Tuoi Dati</h3>
+            <p>Scarica un report dettagliato del tuo progresso per condividerlo o conservarlo.</p>
+            <button class="btn" onclick="exportProgress()">📄 Esporta PDF</button>
+            <button class="btn btn-success" onclick="shareProgress()">📤 Condividi</button>
+        </div>
+    </div>
+    
+    <script>
+        // Dati del progresso (normalmente caricati da database)
+        const progressData = {
+            overall: 65,
+            streak: 12,
+            totalWords: 847,
+            totalHours: 23.5,
+            currentLevel: 'B1',
+            totalPoints: 2340,
+            skills: {
+                grammar: 78,
+                vocabulary: 85,
+                reading: 72,
+                writing: 65,
+                listening: 70
+            },
+            studyDays: [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 17, 19, 20, 22, 23, 24] // Giorni di dicembre studiati
+        };
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressRing();
+            generateStudyCalendar();
+            animateSkillBars();
+        });
+        
+        // Aggiorna il ring di progresso
+        function updateProgressRing() {
+            const ring = document.getElementById('overallProgressRing');
+            const text = document.getElementById('overallProgressText');
+            const radius = 52;
+            const circumference = 2 * Math.PI * radius;
+            const progress = progressData.overall;
+            
+            ring.style.strokeDasharray = circumference;
+            ring.style.strokeDashoffset = circumference - (progress / 100) * circumference;
+            text.textContent = progress + '%';
+        }
+        
+        // Genera il calendario di studio
+        function generateStudyCalendar() {
+            const calendar = document.getElementById('studyCalendar');
+            const today = new Date().getDate();
+            const daysInMonth = 31; // Dicembre
+            
+            // Giorni della settimana
+            const dayNames = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+            dayNames.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.textContent = day;
+                dayHeader.style.fontWeight = 'bold';
+                dayHeader.style.textAlign = 'center';
+                dayHeader.style.padding = '10px';
+                dayHeader.style.color = '#666';
+                calendar.appendChild(dayHeader);
+            });
+            
+            // Giorni del mese
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                if (day === today) {
+                    dayElement.classList.add('today');
+                } else if (progressData.studyDays.includes(day)) {
+                    dayElement.classList.add('studied');
+                } else if (day < today) {
+                    dayElement.classList.add('missed');
+                } else {
+                    dayElement.classList.add('empty');
+                }
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+        
+        // Anima le barre delle competenze
+        function animateSkillBars() {
+            setTimeout(() => {
+                const skillBars = document.querySelectorAll('.skill-fill');
+                skillBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }, 500);
+        }
+        
+        // Esporta progresso in PDF
+        function exportProgress() {
+            // Simulazione - in un'app reale, genereresti un PDF
+            const reportData = {
+                date: new Date().toLocaleDateString('it-IT'),
+                level: progressData.currentLevel,
+                progress: progressData.overall,
+                skills: progressData.skills,
+                achievements: ['First Steps', 'Week Warrior', 'Vocab Master'],
+                recommendations: [
+                    'Continua con il vocabolario medico',
+                    'Migliora il writing accademico',
+                    'Leggi più articoli scientifici'
+                ]
+            };
+            
+            // Crea un blob con i dati
+            const reportText = `
+MEDENGLISH PRO - REPORT PROGRESSO
+Data: ${reportData.date}
+Livello Attuale: ${reportData.level}
+Progresso Complessivo: ${reportData.progress}%
+
+COMPETENZE:
+- Grammatica: ${reportData.skills.grammar}%
+- Vocabolario: ${reportData.skills.vocabulary}%
+- Reading: ${reportData.skills.reading}%
+- Writing: ${reportData.skills.writing}%
+- Listening: ${reportData.skills.listening}%
+
+ACHIEVEMENTS SBLOCCATI:
+${reportData.achievements.map(a => '- ' + a).join('\n')}
+
+RACCOMANDAZIONI:
+${reportData.recommendations.map(r => '- ' + r).join('\n')}
+            `;
+            
+            const blob = new Blob([reportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MedEnglish_Progress_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('📄 Report esportato con successo!');
+        }
+        
+        // Condividi progresso
+        function shareProgress() {
+            const shareText = `🎓 Il mio progresso in MedEnglish Pro:
+📊 Livello: ${progressData.currentLevel}
+📈 Progresso: ${progressData.overall}%
+🔥 Streak: ${progressData.streak} giorni
+📚 Parole apprese: ${progressData.totalWords}
+⏱️ Ore di studio: ${progressData.totalHours}
+
+#MedEnglish #LearningEnglish #MedicalEnglish`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Il mio progresso MedEnglish Pro',
+                    text: shareText
+                });
+            } else {
+                // Fallback per browser che non supportano Web Share API
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('📤 Testo copiato negli appunti! Incollalo dove vuoi condividerlo.');
+                });
+            }
+        }
+        
+        // Aggiornamento automatico dei dati ogni 30 secondi
+        setInterval(() => {
+            // In un'app reale, qui faresti una chiamata API per aggiornare i dati
+            console.log('Aggiornamento dati progresso...');
+        }, 30000);
+        
+        // Salvataggio automatico del progresso
+        function saveProgress() {
+            localStorage.setItem('medEnglishProgress', JSON.stringify(progressData));
+        }
+        
+        // Caricamento del progresso salvato
+        function loadProgress() {
+            const saved = localStorage.getItem('medEnglishProgress');
+            if (saved) {
+                Object.assign(progressData, JSON.parse(saved));
+            }
+        }
+        
+        // Carica i dati all'avvio
+        loadProgress();
+    </script>
+</body>
+</html>

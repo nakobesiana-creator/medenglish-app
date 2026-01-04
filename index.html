@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedEnglish Pro - Sistema Completo di Apprendimento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .feature-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .feature-description {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .feature-highlights {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+        
+        .feature-highlights li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+        
+        .stats-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            color: white;
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .stat-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .about-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+        
+        .about-section h2 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .about-content {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #555;
+            text-align: justify;
+        }
+        
+        .cta-section {
+            text-align: center;
+            color: white;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .cta-section p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 MedEnglish Pro</h1>
+            <p>Il Sistema Completo per Portare il Tuo Inglese Medico da A2 a C2</p>
+            <p><strong>Progettato Specificamente per Professionisti Sanitari</strong></p>
+        </div>
+        
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Livelli CEFR</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">350+</div>
+                    <div class="stat-label">Esercizi Interattivi</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Termini Medici</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Personalizzato</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📚</span>
+                <h3 class="feature-title">App di Apprendimento Interattiva</h3>
+                <p class="feature-description">
+                    Lezioni complete con 5 tipologie di esercizi progettate per il tuo background medico.
+                </p>
+                <ul class="feature-highlights">
+                    <li>✅ Grammatica medica avanzata</li>
+                    <li>✅ Vocabolario specialistico (1000+ termini)</li>
+                    <li>✅ Reading di articoli scientifici</li>
+                    <li>✅ Writing accademico e clinico</li>
+                    <li>✅ Listening di conferenze mediche</li>
+                </ul>
+                <a href="english_learning_app.html" class="btn">Inizia a Studiare</a>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">📊</span>
+                <h3 class="feature-title">Dashboard Progresso Avanzato</h3>
+                <p class="feature-description">
+                    Monitora ogni aspetto del tuo apprendimento con analytics dettagliati e insights personalizzati.
+                </p>
+                <ul class="feature-highlights">
+                    <li>📈 Progresso per competenza</li>
+                    <li>🏆 Sistema di achievements</li>
+                    <li>📅 Calendario di studio</li>
+                    <li>💡 Raccomandazioni AI</li>
+                    <li>📄 Report esportabili</li>
+                </ul>
+                <a href="progress_tracker.html" class="btn btn-secondary">Vedi Progresso</a>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🧠</span>
+                <h3 class="feature-title">Database Intelligente</h3>
+                <p class="feature-description">
+                    Contenuti strutturati e adattivi che si evolvono con il tuo livello di competenza.
+                </p>
+                <ul class="feature-highlights">
+                    <li>🎯 Contenuti per ogni livello CEFR</li>
+                    <li>🔬 Terminologia clinica specializzata</li>
+                    <li>📖 Esempi da letteratura medica</li>
+                    <li>🎨 Apprendimento adattivo</li>
+                    <li>💾 Salvataggio automatico</li>
+                </ul>
+                <a href="#" onclick="showDatabaseInfo()" class="btn">Esplora Database</a>
+            </div>
+        </div>
+        
+        <div class="about-section">
+            <h2>🎯 Perché MedEnglish Pro?</h2>
+            <div class="about-content">
+                <p>
+                    <strong>MedEnglish Pro</strong> nasce dalla necessità di colmare il gap tra l'inglese generale e l'inglese medico specialistico. 
+                    Progettato da e per professionisti sanitari, questo sistema integrato ti accompagna in un percorso strutturato 
+                    dal livello A2 (elementare) fino al C2 (padronanza completa).
+                </p>
+                <br>
+                <p>
+                    A differenza dei corsi generici, ogni esercizio, ogni termine, ogni esempio è contestualizzato nell'ambito 
+                    medico-scientifico. Che tu sia un medico, un ricercatore, un coordinatore di studi clinici o un professionista 
+                    sanitario, troverai contenuti specifici per la tua realtà lavorativa.
+                </p>
+                <br>
+                <p>
+                    Il sistema integra tre componenti fondamentali: <strong>apprendimento interattivo</strong>, 
+                    <strong>monitoraggio del progresso</strong> e <strong>contenuti adattivi</strong>, 
+                    per offrirti un'esperienza di apprendimento completa e personalizzata.
+                </p>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <h2>🚀 Inizia il Tuo Percorso Oggi</h2>
+            <p>Trasforma il tuo inglese medico e apri nuove opportunità professionali</p>
+            <a href="english_learning_app.html" class="btn" style="font-size: 1.2em; padding: 20px 40px;">
+                Inizia Subito - È Gratuito!
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function showDatabaseInfo() {
+            alert(`📊 Database MedEnglish Pro:
+
+🎯 Contenuti per Livello:
+• A2: 50 lezioni base + 100 termini
+• B1: 60 lezioni intermedie + 150 termini  
+• B2: 70 lezioni avanzate + 200 termini
+• C1: 80 lezioni esperte + 250 termini
+• C2: 90 lezioni master + 300 termini
+
+🔬 Specializzazioni:
+• Clinical Research & Trials
+• Patient Care & Communication  
+• Academic Medicine & Publishing
+• Regulatory Affairs
+• Medical Technology
+
+💡 Caratteristiche:
+• Apprendimento adattivo basato su performance
+• Contenuti aggiornati con letteratura medica
+• Sistema di spaced repetition per vocabolario
+• Integrazione con PubMed e risorse scientifiche
+
+Clicca su "Inizia a Studiare" per accedere a tutti i contenuti!`);
+        }
+        
+        // Animazioni al caricamento
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(50px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedEnglish Pro - Il Tuo Percorso A2→C2</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 MedEnglish Pro</h1>
+            <p>Il tuo percorso personalizzato da A2 a C2</p>
+            <div class="level-indicator">
+                <strong>Livello Attuale: <span id="currentLevel">A2</span></strong>
+                <span id="levelProgress">25%</span>
+            </div>
+            <!-- Microlearning Timer - Ispirato a Wiser -->
+            <div class="microlearning-timer microlearning-timer-container">
+                <span>⏱️ Sessione Micro: <span id="sessionTimer">5:00</span></span>
+                <button id="startMicroSession" class="btn microlearning-start-btn">
+                    🚀 Start 5-Min Learning
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Sidebar Sinistra: Progresso e Menu -->
+            <div class="sidebar">
+                <h3>📊 Il Tuo Progresso</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="overallProgress"></div>
+                </div>
+                <p><span id="progressText">25%</span> verso C2</p>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="streakDays">7</div>
+                        <div>Giorni Consecutivi</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="wordsLearned">342</div>
+                        <div>Parole Apprese</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="lessonsCompleted">28</div>
+                        <div>Lezioni Completate</div>
+                    </div>
+                </div>
+                
+                <h4>🎯 Scegli il Livello</h4>
+                <div class="level-selector">
+                    <button class="level-btn active" onclick="setLevel('A2')">A2</button>
+                    <button class="level-btn" onclick="setLevel('B1')">B1</button>
+                    <button class="level-btn" onclick="setLevel('B2')">B2</button>
+                    <button class="level-btn" onclick="setLevel('C1')">C1</button>
+                    <button class="level-btn" onclick="setLevel('C2')">C2</button>
+                </div>
+                
+                <h4>📚 Tipo di Lezione</h4>
+                
+                <!-- NUOVO: Sezione General English Completa (A2→B2) -->
+                <div class="general-english-container">
+                    <h5 class="general-english-title">🎯 General English Journey (A2→B2)</h5>
+                    
+                    <!-- Progresso Generale -->
+                    <div class="progress-container-margin">
+                        <div class="progress-info-row">
+                            <span>Livello Attuale: <strong id="currentGeneralLevelDisplay">A2</strong></span>
+                            <span id="generalProgressText">Progresso: 0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div id="generalProgressBar" class="progress-fill w-0"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Percorso Livelli -->
+                    <div class="level-path-container">
+                        <div class="level-path-line"></div>
+                        
+                        <div class="level-node-circle level-node-completed" id="levelA2">A2</div>
+                        <div class="level-node-circle level-node-locked" id="levelB1">B1</div>
+                        <div class="level-node-circle level-node-locked" id="levelB2">B2</div>
+                        <div class="level-node-circle level-node-medical">MED</div>
+                    </div>
+                    
+                    <!-- Pulsanti Livello -->
+                    <div class="level-buttons-grid">
+                        <button class="btn level-access-btn-styled" onclick="accessGeneralLevel('A2')" id="accessA2">
+                            📖 A2 Foundation
+                        </button>
+                        <button class="btn level-access-btn-styled level-access-btn-disabled" onclick="accessGeneralLevel('B1')" id="accessB1" disabled>
+                            🎯 B1 Intermediate
+                        </button>
+                        <button class="btn level-access-btn-styled level-access-btn-disabled" onclick="accessGeneralLevel('B2')" id="accessB2" disabled>
+                            🚀 B2 Advanced
+                        </button>
+                    </div>
+                    
+                    <div class="general-level-status" id="generalLevelStatus">
+                        Completa A2 (80%) per sbloccare B1, poi B2 per accedere ai contenuti medici
+                    </div>
+                </div>
+                
+                <!-- Sezione Medica (bloccata fino a B2) -->
+                <div id="medicalSection" class="medical-section-locked">
+                    <h5 class="medical-section-title">🏥 Medical English (Richiede B2)</h5>
+                    <div class="medical-lock-msg">
+                        🔒 Sblocca completando B2 General English
+                    </div>
+                    <button class="btn medical-lesson-btn" onclick="showLesson('grammar')">📝 Grammatica Medica</button>
+                    <button class="btn medical-lesson-btn" onclick="showLesson('vocabulary')">🔬 Vocabolario Clinico</button>
+                    <button class="btn medical-lesson-btn" onclick="showLesson('conversation')">🗣️ Conversazioni Mediche</button>
+                    
+                    <!-- PREMIUM FEATURES -->
+                    <button class="btn medical-lesson-btn" onclick="showLesson('ai-chat')">
+                        🤖 AI Medical Chat <span class="premium-lock-icon">🔒</span>
+                    </button>
+                    <button class="btn medical-lesson-btn" onclick="showLesson('roleplay')">
+                        🎭 Roleplay Clinico <span class="premium-lock-icon">🔒</span>
+                    </button>
+                    
+                    <button class="btn medical-lesson-btn" onclick="showLesson('reading')">📖 Letteratura Medica</button>
+                    <button class="btn medical-lesson-btn" onclick="showLesson('writing')">✍️ Scrittura Scientifica</button>
+                    <button class="btn medical-lesson-btn" onclick="showLesson('listening')">🎧 Conferenze Mediche</button>
+                    
+                    <button class="btn medical-lesson-btn" onclick="showLesson('photo-mode')">
+                        📸 Imaging Medico <span class="premium-lock-icon">🔒</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Area Centrale: Lezioni -->
+            <div class="lesson-area">
+                <!-- NUOVA SEZIONE: General English A2→B2 -->
+                <div id="general-english" class="lesson-type active">
+                    <h2>🎯 General English Journey - A2 to B2</h2>
+                    <div class="medical-context">
+                        <h4>🏗️ Costruisci una Base Solida</h4>
+                        <p>Completa il percorso A2→B1→B2 per sbloccare i contenuti medici specializzati. Ogni livello richiede 80% di competenza per avanzare.</p>
+                        <div class="level-detail-container">
+                            <div class="progress-info-row level-detail-info">
+                                <span>Livello Attuale: <strong id="currentLevelDisplay">A2</strong></span>
+                                <span id="levelDetailProgress">Progresso: 0%</span>
+                            </div>
+                            <div class="level-detail-progress-track">
+                                <div id="levelDetailProgressBar" class="level-detail-progress-fill w-0"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selezione Livello -->
+                    <div class="level-selection-container">
+                        <h4>🎯 Scegli il Tuo Livello</h4>
+                        <div class="level-cards-grid">
+                            <div class="level-card-base level-card-a2" id="levelCardA2" onclick="selectGeneralLevel('A2')">
+                                <div class="level-card-icon">📖</div>
+                                <h5 class="level-card-title level-card-title-a2">A2 - Elementary</h5>
+                                <p class="level-card-desc">Fondamenti grammaticali e vocabolario base</p>
+                                <div class="level-card-status level-card-status-available" id="statusA2">✅ Disponibile</div>
+                                <div class="level-card-progress" id="progressA2">0% completato</div>
+                            </div>
+                            
+                            <div class="level-card-base level-card-b1 level-card-locked" id="levelCardB1" onclick="selectGeneralLevel('B1')">
+                                <div class="level-card-icon">🏗️</div>
+                                <h4 class="level-card-title level-card-title-b1">B1 - Intermediate</h4>
+                                <p class="level-card-desc">Conversazioni più complesse e introduzione al medical English.</p>
+                                <div class="level-card-status level-card-status-locked">🔒 Locked</div>
+                            </div>
+                            
+                            <div class="level-card-base level-card-b2 level-card-locked" id="levelCardB2" onclick="selectGeneralLevel('B2')">
+                                <div class="level-card-icon">🏥</div>
+                                <h4 class="level-card-title level-card-title-b2">B2 - Upper Intermediate</h4>
+                                <p class="level-card-desc">Inglese medico essenziale e casi clinici.</p>
+                                <div class="level-card-status level-card-status-locked">🔒 Locked</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Area Contenuto Livello Selezionato -->
+                    <div id="levelContent" class="level-content-container hidden">
+                        <h3 id="selectedLevelTitle">Level Title</h3>
+                        <div class="medical-context">
+                            <h4>🎯 Obiettivi del Livello</h4>
+                            <p id="selectedLevelDescription">Descrizione del livello</p>
+                        </div>
+                        
+                        <!-- Selezione Topic -->
+                        <div id="topicSelection" class="topic-selection-area">
+                            <h4>📚 Scegli l'Argomento</h4>
+                            <div id="topicButtons" class="topic-buttons-grid">
+                                <!-- I pulsanti topic verranno generati dinamicamente -->
+                            </div>
+                        </div>
+                        
+                        <!-- Area Domande -->
+                        <div id="questionArea" class="question-area-container">
+                            <div class="question" id="generalQuestion">
+                                <h3>Seleziona un argomento per iniziare</h3>
+                                <p>Scegli uno degli argomenti sopra per iniziare.</p>
+                            </div>
+                            
+                            <div class="options" id="generalOptions">
+                                <!-- Le opzioni verranno caricate dinamicamente -->
+                            </div>
+                            
+                            <div class="feedback" id="generalFeedback"></div>
+                            
+                            <div class="next-question-btn-container">
+                                <button class="btn next-question-btn" onclick="nextGeneralQuestion()" id="generalNextBtn">
+                                    Prossima Domanda ➡️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Motivazione -->
+                    <div class="medical-context">
+                        <h4>🎯 Perché A2→B2 Prima del Medico</h4>
+                        <div class="motivation-grid">
+                            <div class="motivation-card motivation-card-blue">
+                                <strong>🏗️ Base Grammaticale Solida</strong><br>
+                                <small>Le strutture complesse B2 sono essenziali per comprendere testi medici</small>
+                            </div>
+                            <div class="motivation-card motivation-card-green">
+                                <strong>💬 Comunicazione Professionale</strong><br>
+                                <small>Competenze B2 permettono discussioni mediche sofisticate</small>
+                            </div>
+                            <div class="motivation-card motivation-card-orange">
+                                <strong>✍️ Scrittura Accademica</strong><br>
+                                <small>Necessaria per case report, articoli e documentazione clinica</small>
+                            </div>
+                            <div class="motivation-card motivation-card-purple">
+                                <strong>🎯 Successo Garantito</strong><br>
+                                <small>Con B2 solido, l'inglese medico diventa molto più accessibile</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lezione Grammatica -->
+                <div id="grammar" class="lesson-type active">
+                    <h2>📝 Grammatica Avanzata</h2>
+                    <div class="medical-context">
+                        <h4>🏥 Contesto Medico-Scientifico</h4>
+                        <p>Impara le strutture grammaticali essenziali per la comunicazione professionale in ambito sanitario.</p>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Conditional Sentences in Medical Research</h3>
+                        <p>Complete the sentence with the correct conditional form:</p>
+                        <p><strong>"If the clinical trial _____ (to show) significant results, the drug _____ (to receive) FDA approval."</strong></p>
+                    </div>
+                    
+                    <div class="options">
+                        <button class="option" onclick="checkAnswer(this, false)">shows / will receive</button>
+                        <button class="option" onclick="checkAnswer(this, true)">had shown / would have received</button>
+                        <button class="option" onclick="checkAnswer(this, false)">showed / would receive</button>
+                        <button class="option" onclick="checkAnswer(this, false)">will show / receives</button>
+                    </div>
+                    
+                    <div class="feedback" id="grammarFeedback"></div>
+                </div>
+                
+                <!-- Lezione Frasi Quotidiane per Superare il Blocco -->
+                <div id="conversation" class="lesson-type">
+                    <h2>🗣️ Frasi Quotidiane - Supera il Blocco!</h2>
+                    <div class="medical-context">
+                        <h4>💬 Comunicazione Fluida</h4>
+                        <p>Impara frasi "salvavita" per parlare e scrivere con sicurezza, anche quando hai un blocco mentale.</p>
+                        <div class="conversation-progress-container">
+                            <div class="progress-info-row text-secondary">
+                                <span>Progresso Situazioni:</span>
+                                <span id="conversationProgress">0/8 completate</span>
+                            </div>
+                            <div class="conversation-progress-track">
+                                <div id="conversationProgressBar" class="conversation-progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Situazione: Guadagnare Tempo per Pensare</h3>
+                        <p>Quando hai bisogno di qualche secondo per organizzare i tuoi pensieri, quale frase usi?</p>
+                        <p><strong>Scenario:</strong> "Il collega ti fa una domanda complessa durante una riunione"</p>
+                    </div>
+                    
+                    <div class="options">
+                        <button class="option" onclick="checkConversationAnswer(this, true, 'Perfetto! Questa frase ti dà tempo per pensare e mostra che stai considerando seriamente la domanda.')">That's a good question, let me think about that...</button>
+                        <button class="option" onclick="checkConversationAnswer(this, false, 'Troppo diretto. Meglio guadagnare tempo per dare una risposta più riflessiva.')">I don't know</button>
+                        <button class="option" onclick="checkConversationAnswer(this, true, 'Ottima scelta! Mostra che stai riflettendo sulla questione.')">Well, there are several ways to look at this...</button>
+                        <button class="option" onclick="checkConversationAnswer(this, false, 'Troppo vago. È meglio essere più specifici.')">Maybe</button>
+                    </div>
+                    
+                    <div class="feedback" id="conversationFeedback"></div>
+                    
+                    <div class="medical-context">
+                        <h4>🎯 Frasi Utili per Questa Situazione</h4>
+                        <div id="phraseSuggestions">
+                            <p><strong>Guadagnare tempo:</strong></p>
+                            <ul>
+                                <li>"That's an excellent question..." ⏰</li>
+                                <li>"Let me think about that for a moment..." 🤔</li>
+                                <li>"Actually, that reminds me of..." 💭</li>
+                                <li>"Well, there are several ways to look at this..." 🔍</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="anti-block-tips">
+                        <h4>💡 Trucco Anti-Blocco</h4>
+                        <p><strong>Quando hai un blocco mentale:</strong></p>
+                        <ol>
+                            <li>Usa una frase "guadagna-tempo" ⏰</li>
+                            <li>Respira profondamente 🫁</li>
+                            <li>Inizia con quello che sai 🧠</li>
+                            <li>Usa parole semplici prima, poi migliora 📈</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <!-- Lezione Vocabolario -->
+                <div id="vocabulary" class="lesson-type">
+                    <h2>🔬 Vocabolario Medico Specialistico</h2>
+                    <div class="medical-context">
+                        <h4>🧬 Terminologia Clinica</h4>
+                        <p>Espandi il tuo vocabolario con termini essenziali per la ricerca clinica e la pratica medica.</p>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Medical Term Definition</h3>
+                        <p>What does <strong>"Pharmacovigilance"</strong> mean?</p>
+                        <div class="pronunciation-controls">
+                            <span id="pronunciationScore">Punteggio: -/100</span>
+                            <button class="pronunciation-btn pronunciation-test-btn" onclick="testAudio()">🎵 Test Audio</button>
+                        </div>
+                    </div>
+                    
+                    <input type="text" class="vocabulary-input" id="vocabInput" placeholder="Scrivi la definizione in inglese...">
+                    <button class="btn" onclick="checkVocabulary()">Verifica Risposta</button>
+                    
+                    <div class="feedback" id="vocabFeedback"></div>
+                    
+                    <div class="medical-context">
+                        <h4>📖 Esempio in Contesto</h4>
+                        <p><em>"The pharmaceutical company implemented robust <strong>pharmacovigilance</strong> procedures to monitor adverse drug reactions during the clinical trial."</em></p>
+                    </div>
+                </div>
+                
+                <!-- Lezione Reading -->
+                <div id="reading" class="lesson-type">
+                    <h2>📖 Reading Comprehension - Scientific Articles</h2>
+                    <div class="medical-context">
+                        <h4>🔬 Abstract Scientifico</h4>
+                        <p>Leggi e comprendi questo estratto da una pubblicazione medica:</p>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Research Article Extract</h3>
+                        <p class="reading-text-justify">
+                            <strong>Background:</strong> Pediatric clinical trials face unique challenges in terms of ethical considerations and regulatory compliance. The implementation of the Clinical Trials Regulation (EU) 536/2014 has introduced new transparency requirements, including the mandatory publication of lay summaries accessible to the general public.
+                            <br><br>
+                            <strong>Methods:</strong> We conducted a systematic analysis of 235 pediatric clinical trials registered in the Clinical Trials Information System (CTIS) between 2022 and 2025, focusing on compliance with transparency requirements and sustainability indicators for participating families.
+                        </p>
+                    </div>
+                    
+                    <div class="question">
+                        <p><strong>Question:</strong> According to the text, what is the main focus of the research?</p>
+                    </div>
+                    
+                    <div class="options">
+                        <button class="option" onclick="checkAnswer(this, false)">Pediatric drug development</button>
+                        <button class="option" onclick="checkAnswer(this, true)">Transparency compliance in pediatric trials</button>
+                        <button class="option" onclick="checkAnswer(this, false)">CTIS system implementation</button>
+                        <button class="option" onclick="checkAnswer(this, false)">Family sustainability in healthcare</button>
+                    </div>
+                    
+                    <div class="feedback" id="readingFeedback"></div>
+                </div>
+                
+                <!-- Lezione Writing -->
+                <div id="writing" class="lesson-type">
+                    <h2>✍️ Academic Writing - Research Proposals</h2>
+                    <div class="medical-context">
+                        <h4>📝 Scrittura Accademica</h4>
+                        <p>Sviluppa le tue competenze di scrittura per articoli scientifici e proposte di ricerca.</p>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Writing Task: Research Objective</h3>
+                        <p>Write a clear and concise research objective for a study investigating the effectiveness of a new pediatric treatment. Use appropriate academic language and structure.</p>
+                        <p><strong>Requirements:</strong> 100-150 words, formal tone, clear hypothesis</p>
+                    </div>
+                    
+                    <textarea class="writing-area" id="writingArea" placeholder="Write your research objective here..."></textarea>
+                    <div class="word-count">Words: <span id="wordCount">0</span>/150</div>
+                    
+                    <button class="btn" onclick="analyzeWriting()">Analizza Scrittura</button>
+                    <button class="btn btn-success" onclick="getWritingSuggestions()">Suggerimenti</button>
+                    
+                    <div class="feedback" id="writingFeedback"></div>
+                </div>
+                
+                <!-- Lezione Listening -->
+                <div id="listening" class="lesson-type">
+                    <h2>🎧 Medical Listening - Conference Presentations</h2>
+                    <div class="medical-context">
+                        <h4>🎤 Presentazione Scientifica</h4>
+                        <p>Ascolta e comprendi presentazioni mediche professionali.</p>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Medical Conference Extract</h3>
+                        <p>Listen to this excerpt from a medical conference presentation:</p>
+                        <button class="btn" onclick="playAudio()" id="playBtn">▶️ Play Audio</button>
+                        <button class="btn" onclick="pauseAudio()" id="pauseBtn">⏸️ Pause</button>
+                    </div>
+                    
+                    <div class="question">
+                        <p><strong>Question:</strong> What is the main conclusion of the presenter?</p>
+                    </div>
+                    
+                    <div class="options">
+                        <button class="option" onclick="checkAnswer(this, true)">The new treatment shows promising results</button>
+                        <button class="option" onclick="checkAnswer(this, false)">More research is needed</button>
+                        <button class="option" onclick="checkAnswer(this, false)">The study was inconclusive</button>
+                        <button class="option" onclick="checkAnswer(this, false)">Side effects are concerning</button>
+                    </div>
+                    
+                    <div class="feedback" id="listeningFeedback"></div>
+                </div>
+
+                <!-- NUOVA SEZIONE: AI Conversation (Ispirata a TalkPal) -->
+                <div id="ai-chat" class="lesson-type">
+                    <h2>🤖 AI Medical Conversation</h2>
+                    <div class="medical-context">
+                        <h4>💬 Conversazione Intelligente</h4>
+                        <p>Pratica conversazioni mediche realistiche con il nostro AI tutor. Ricevi feedback grammaticale istantaneo!</p>
+                        <div class="ai-chat-controls">
+                            <span>🤖 AI Doctor Assistant</span>
+                            <select id="aiChatMode" class="ai-mode-select">
+                                <option value="general">General Practice</option>
+                                <option value="cardio">Cardiology</option>
+                                <option value="emergency">Emergency</option>
+                                <option value="grammar">Grammar Coach</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-chat-container">
+                        <div id="chatMessages">
+                            <div class="ai-message ai-message-bubble ai">
+                                <strong>🤖 AI Doctor:</strong> Hello! I'm Dr. AI. Let's practice a medical consultation. I'll be your patient today. I've been experiencing some chest pain. Can you help me?
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-input-container">
+                        <input type="text" id="aiChatInput" placeholder="Type your response in English..." class="ai-text-input">
+                        <button class="btn ai-send-btn" onclick="sendAIMessage()">Send</button>
+                        <button class="btn ai-voice-btn" onclick="startVoiceInput()">🎤 Voice</button>
+                        <button class="btn ai-end-btn" onclick="endAISession()">End Session</button>
+                    </div>
+                    
+                    <div id="aiGrammarFeedback" class="feedback hidden-element"></div>
+                    
+                    <div class="medical-context">
+                        <h4>💡 AI Feedback Features</h4>
+                        <ul class="ai-features-list">
+                            <li>✅ <strong>Grammar Check:</strong> Correzioni grammaticali istantanee</li>
+                            <li>✅ <strong>Medical Vocabulary:</strong> Suggerimenti terminologici</li>
+                            <li>✅ <strong>Pronunciation:</strong> Feedback sulla pronuncia (voice mode)</li>
+                            <li>✅ <strong>Fluency Score:</strong> Valutazione della fluidità</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- NUOVA SEZIONE: Medical Roleplay (Ispirata a TalkPal) -->
+                <div id="roleplay" class="lesson-type">
+                    <h2>🎭 Medical Roleplay Scenarios</h2>
+                    <div class="medical-context">
+                        <h4>🏥 Scenari Immersivi</h4>
+                        <p>Pratica situazioni mediche realistiche. Scegli il tuo ruolo e interagisci!</p>
+                        <div class="roleplay-scenario-info">
+                            <strong>Scenario Attivo:</strong> <span id="currentScenario">Emergency Room Consultation</span>
+                        </div>
+                    </div>
+                    
+                    <div class="roleplay-setup roleplay-setup-box">
+                        <h3>🎭 Select a Scenario</h3>
+                        <p>Choose a medical scenario to roleplay:</p>
+                        
+                        <div class="scenario-grid">
+                            <div class="scenario-card" onclick="selectScenario('emergency')">
+                                <strong>🚑 Emergency Room</strong>
+                                <p>Handle a triage situation</p>
+                            </div>
+                            <div class="scenario-card" onclick="selectScenario('consultation')">
+                                <strong>👨‍⚕️ Patient Consultation</strong>
+                                <p>Standard check-up routine</p>
+                            </div>
+                            <div class="scenario-card" onclick="selectScenario('research')">
+                                <strong>🔬 Medical Research</strong>
+                                <p>Discuss findings with colleagues</p>
+                            </div>
+                            <div class="scenario-card" onclick="selectScenario('conference')">
+                                <strong>🎤 Medical Conference</strong>
+                                <p>Present a case study</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="roleplayChat" class="ai-chat-container hidden">
+                        <div id="roleplayMessages"></div>
+                    </div>
+                    
+                    <div id="roleplayInput" class="hidden">
+                        <div class="ai-input-container">
+                            <input type="text" id="roleplayTextInput" placeholder="What do you say to the patient?" class="ai-text-input">
+                            <button class="btn ai-send-btn" onclick="sendRoleplayMessage()">Send</button>
+                        </div>
+                    </div>
+                    
+
+                </div>
+
+                <!-- NUOVA SEZIONE: Photo Mode (Ispirata a TalkPal) -->
+                <div id="photo-mode" class="lesson-type">
+                    <h2>📸 Medical Photo Description</h2>
+                    <div class="medical-context">
+                        <h4>🖼️ Descrivi Immagini Mediche</h4>
+                        <p>Migliora il tuo vocabolario descrivendo immagini mediche, anatomiche e cliniche in inglese.</p>
+                    </div>
+                    
+                    <div class="photo-container photo-display-container">
+                        <div id="medicalPhoto" class="medical-photo-box" onclick="loadNewPhoto()">
+                            <div class="photo-placeholder-content">
+                                <div class="photo-icon">🫁</div>
+                                <p><strong>Chest X-Ray</strong></p>
+                                <p>Click to load new image</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h3>Describe what you see</h3>
+                        <p>Look at the medical image above and describe it in English. Include anatomical terms, observations, and potential findings.</p>
+                    </div>
+                    
+                    <textarea id="photoDescription" class="writing-area photo-description-area" placeholder="Describe the medical image in detail using appropriate medical terminology..."></textarea>
+                    <div class="word-count">Words: <span id="photoWordCount">0</span></div>
+                    
+                    <div class="photo-mode-controls">
+                        <button class="btn" onclick="analyzePhotoDescription()">🔍 Analyze Description</button>
+                        <button class="btn photo-hint-btn" onclick="getPhotoHints()">💡 Get Hints</button>
+                        <button class="btn photo-new-btn" onclick="loadNewPhoto()">🔄 New Image</button>
+                    </div>
+                    
+                    <div class="feedback" id="photoFeedback"></div>
+                    
+                    <div class="medical-context">
+                        <h4>📚 Vocabulary Bank</h4>
+                        <div id="photoVocabBank" class="photo-vocab-grid">
+                            <div class="photo-vocab-item">
+                                <strong>anatomy</strong><br>anatomia
+                            </div>
+                            <div class="photo-vocab-item">
+                                <strong>radiograph</strong><br>radiografia
+                            </div>
+                            <div class="photo-vocab-item">
+                                <strong>diagnosis</strong><br>diagnosi
+                            </div>
+                            <div class="photo-vocab-item">
+                                <strong>pathology</strong><br>patologia
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lesson-nav">
+                    <button class="btn" onclick="previousLesson()">⬅️ Precedente</button>
+                    <button class="btn btn-success" onclick="nextLesson()">Prossima ➡️</button>
+                </div>
+            </div>
+            
+            <!-- Sidebar Destra: Strumenti -->
+            <div class="sidebar">
+                <h3>🛠️ Strumenti di Studio</h3>
+                
+                <!-- Audio Controls -->
+                <div class="sidebar-section">
+                    <h4>� Caontrolli Audio</h4>
+                    <div class="sidebar-btn-container">
+                        <button class="btn sidebar-audio-btn" onclick="testAudio()">
+                            🎵 Test Audio
+                        </button>
+                        <button class="btn sidebar-settings-btn" onclick="showVoiceSettings()">
+                            ⚙️ Impostazioni Voce
+                        </button>
+                    </div>
+                    <div class="level-detail-info">
+                        <p>💡 Se l'audio non funziona:</p>
+                        <ul class="sidebar-list">
+                            <li>Controlla il volume del browser</li>
+                            <li>Prova il test audio</li>
+                            <li>Usa Chrome o Firefox</li>
+                            <li>Clicca prima su una parola</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="sidebar-nav-container">
+                    <a href="progress_tracker.html" class="btn sidebar-nav-btn">
+                        📊 Dashboard Completo
+                    </a>
+                    <a href="index.html" class="btn sidebar-home-btn">
+                        🏠 Menu Principale
+                    </a>
+                </div>
+                
+                <div class="sidebar-subscription">
+                    <h4>💎 Abbonamento</h4>
+                    <div class="stat-card">
+                        <div id="subscriptionStatus" class="badge badge-free">Free Plan</div>
+                        <p class="subscription-text">Sblocca tutte le funzionalità mediche avanzate.</p>
+                        <button class="btn btn-primary" onclick="showPremiumModal('Upgrade')" style="width: 100%; margin-top: 10px;">
+                            👑 Passa a Premium
+                        </button>
+                    </div>
+                </div>
+
+                <h4>📚 Dizionario Medico</h4>
+                <input type="text" class="vocabulary-input" id="dictionaryInput" placeholder="Cerca termine medico...">
+                <button class="btn dictionary-btn" onclick="searchDictionary()">Cerca</button>
+                <div id="dictionaryResult" class="dictionary-result"></div>
+                
+                <h4>🎯 Obiettivi Giornalieri</h4>
+                <div class="stat-card">
+                    <div class="progress-header-flex">
+                        <span>Lezioni</span>
+                        <span>2/3</span>
+                    </div>
+                    <div class="progress-bar progress-bar-container">
+                        <div class="progress-fill w-67"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="progress-header-flex">
+                        <span>Vocabolario</span>
+                        <span>12/15</span>
+                    </div>
+                    <div class="progress-bar progress-bar-container">
+                        <div class="progress-fill w-80"></div>
+                    </div>
+                </div>
+                
+                <h4>🏆 Prossimi Traguardi</h4>
+                <div class="milestones-list">
+                    <p>🎯 <strong>B1 Level:</strong> 15 lezioni rimanenti</p>
+                    <p>📖 <strong>500 parole:</strong> 158 da imparare</p>
+                    <p>✍️ <strong>Writing fluency:</strong> 3 saggi da completare</p>
+                </div>
+                
+                <h4>💡 Suggerimento del Giorno</h4>
+                <div class="medical-context">
+                    <p class="daily-tip-text">
+                        <strong>Tip:</strong> Leggi almeno un abstract di PubMed al giorno per migliorare il reading scientifico!
+                    </p>
+                </div>
+                
+                <h4>🆘 Frasi Salvavita</h4>
+                <div class="medical-context">
+                    <p class="emergency-intro"><strong>Quando hai un blocco mentale:</strong></p>
+                    <div id="emergencyPhrases" class="emergency-phrases-container">
+                        <p>💭 <em>"Let me think about that..."</em></p>
+                        <p>🤔 <em>"That's a good question..."</em></p>
+                        <p>⏰ <em>"Actually, that reminds me..."</em></p>
+                        <p>🔄 <em>"In other words..."</em></p>
+                    </div>
+                    <button class="btn emergency-btn" onclick="showRandomEmergencyPhrase()">
+                        🎲 Nuova Frase
+                    </button>
+                </div>
+                <div class="footer-info">
+                    <p class="footer-copyright">&copy; 2024 MedEnglish Pro. Tutti i diritti riservati.</p>
+                    <p>Designed for medical professionals worldwide 🌍</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="english_app_data.js"></script>
+    <script src="enhanced_features.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
