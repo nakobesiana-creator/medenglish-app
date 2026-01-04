@@ -2037,35 +2037,65 @@
         }
 
         function generateAIResponse(userMessage, mode) {
+            const msg = userMessage.toLowerCase();
+            
+            // Common Greetings
+            if (msg.match(/\b(hi|hello|hey|good morning|good afternoon|greetings)\b/)) {
+                return "Hello doctor. I'm glad you can see me. I'm really worried about my condition.";
+            }
+
+            // Keyword-based responses for better simulation
             const responses = {
                 'patient-consultation': [
-                    "Thank you for asking about my symptoms. The chest pain started yesterday and it's getting worse when I breathe deeply.",
-                    "I appreciate your concern, doctor. I've also been feeling short of breath, especially when walking upstairs.",
-                    "Yes, I understand. Should I be worried about this pain? It's really concerning me.",
-                    "I've been taking some over-the-counter pain medication, but it doesn't seem to help much."
+                    { keywords: ['pain', 'hurt', 'ache', 'symptom'], response: "The pain is sharp and located in my chest. It started about two hours ago and radiates to my left arm." },
+                    { keywords: ['where', 'location', 'point'], response: "It hurts right in the center of my chest, slightly to the left. It feels like a heavy weight." },
+                    { keywords: ['severity', 'bad', 'scale', '1 to 10', '1-10'], response: "I would say it's an 8 out of 10. It's really intense, I've never felt this before." },
+                    { keywords: ['medication', 'drug', 'medicine', 'pill'], response: "I took some aspirin an hour ago, but it didn't help at all. I take medication for high blood pressure usually." },
+                    { keywords: ['history', 'previous', 'before', 'past'], response: "No, I've never felt anything like this before. My father had heart problems, though." },
+                    { keywords: ['allergy', 'allergic', 'reaction'], response: "I'm allergic to penicillin, it gives me a rash. No other allergies." },
+                    { keywords: ['breath', 'breathing', 'shortness', 'dyspnea'], response: "Yes, I feel a bit short of breath, especially when I try to talk or walk." },
+                    { keywords: ['nausea', 'vomit', 'stomach'], response: "I feel a bit nauseous, but I haven't vomited." },
+                    { keywords: ['fever', 'temperature', 'hot'], response: "I don't think I have a fever. I feel cold and clammy actually." },
+                    { keywords: ['smoke', 'alcohol', 'drink', 'cigarette'], response: "I smoke about half a pack a day. I drink socially on weekends." }
                 ],
                 'colleague-discussion': [
-                    "That's an interesting case. Have you considered ordering additional cardiac enzymes?",
-                    "Based on the symptoms, I would recommend an ECG and chest X-ray as initial investigations.",
-                    "In my experience with similar cases, we should also consider pulmonary embolism in the differential diagnosis.",
-                    "What's your assessment of the patient's risk factors for cardiovascular disease?"
+                    { keywords: ['enzyme', 'troponin', 'test', 'lab'], response: "The troponin levels are slightly elevated. We should repeat the test in 3 hours." },
+                    { keywords: ['ecg', 'ekg', 'tracing'], response: "The ECG shows ST elevation in leads V1-V4. It looks like an anterior STEMI." },
+                    { keywords: ['history', 'risk', 'factor'], response: "The patient is a smoker with hypertension. No history of diabetes." },
+                    { keywords: ['plan', 'treatment', 'management'], response: "I recommend immediate catheterization. The cath lab is ready." },
+                    { keywords: ['opinion', 'think', 'diagnosis'], response: "Based on the presentation, acute myocardial infarction is the most likely diagnosis." }
                 ],
                 'research-presentation': [
-                    "Those are compelling results. What was your sample size for this study?",
-                    "The methodology seems robust. How did you control for confounding variables?",
-                    "This could have significant clinical implications. Have you considered a multi-center trial?",
-                    "The statistical analysis is impressive. What's the next step in your research?"
+                    { keywords: ['sample', 'size', 'n=', 'population'], response: "Our sample size was 500 patients, randomized 1:1 between the control and intervention groups." },
+                    { keywords: ['method', 'design', 'study'], response: "We used a double-blind, placebo-controlled design to minimize bias." },
+                    { keywords: ['result', 'outcome', 'finding'], response: "The primary outcome showed a 20% reduction in mortality, with a p-value of 0.03." },
+                    { keywords: ['limit', 'bias', 'weakness'], response: "The main limitation was the short follow-up period of 6 months." }
                 ],
                 'case-study': [
-                    "This case presents several diagnostic challenges. What additional tests would you recommend?",
-                    "The patient's history is complex. How would you prioritize the differential diagnoses?",
-                    "Given the clinical presentation, what's your treatment approach?",
-                    "This is a rare condition. What resources would you consult for management guidelines?"
+                    { keywords: ['test', 'diagnostic', 'investigation'], response: "A CT angiogram would be the gold standard here to rule out pulmonary embolism." },
+                    { keywords: ['differential', 'diagnosis', 'possibility'], response: "Differential diagnoses include aortic dissection, PE, and pneumothorax." },
+                    { keywords: ['treat', 'manage', 'therapy'], response: "Initial management should focus on hemodynamic stability and pain control." }
                 ]
             };
             
             const modeResponses = responses[mode] || responses['patient-consultation'];
-            return modeResponses[Math.floor(Math.random() * modeResponses.length)];
+            
+            // Find matching response
+            for (const item of modeResponses) {
+                if (item.keywords.some(k => msg.includes(k))) {
+                    return item.response;
+                }
+            }
+            
+            // Context-aware fallbacks
+            const fallbacks = [
+                "Could you be more specific about that? I'm not sure I understand.",
+                "I'm feeling quite unwell. Can you ask about my symptoms or history?",
+                "That's a good question, but I'm more worried about this pain right now.",
+                "I'm not sure. What do you think is happening to me, doctor?"
+            ];
+            
+            return fallbacks[Math.floor(Math.random() * fallbacks.length)];
         }
 
         function startVoiceInput() {
@@ -2211,35 +2241,80 @@
         }
 
         function generateRoleplayResponse(userMessage, scenario) {
+            const msg = userMessage.toLowerCase();
+            
+            // Common Greetings
+            if (msg.match(/\b(hi|hello|hey|good morning|good afternoon)\b/)) {
+                if (scenario === 'emergency') return "Doctor, please help me! I'm in so much pain.";
+                if (scenario === 'consultation') return "Hello doctor, thanks for seeing me today about my medication.";
+                return "Good day. I'm looking forward to discussing this case.";
+            }
+
             const responses = {
                 emergency: [
-                    "Doctor, the pain is unbearable! It started about 2 hours ago and it's getting worse.",
-                    "I feel nauseous and I vomited once. The pain is here, in my lower right abdomen.",
-                    "No, I haven't had surgery before. I'm really scared, doctor. What's wrong with me?",
-                    "Yes, I can walk, but it hurts a lot. Should I be worried about appendicitis?"
+                    { keywords: ['pain', 'hurt', 'unbearable'], response: "Doctor, the pain is unbearable! It started about 2 hours ago and it's getting worse." },
+                    { keywords: ['nausea', 'vomit', 'stomach'], response: "I feel nauseous and I vomited once. The pain is here, in my lower right abdomen." },
+                    { keywords: ['history', 'surgery', 'operation'], response: "No, I haven't had surgery before. I'm really scared, doctor. What's wrong with me?" },
+                    { keywords: ['walk', 'move', 'stand'], response: "Yes, I can walk, but it hurts a lot. Should I be worried about appendicitis?" },
+                    { keywords: ['fever', 'temperature'], response: "I feel hot and sweaty. Do I have a fever?" },
+                    { keywords: ['allergy', 'drug'], response: "I'm not allergic to anything that I know of." }
                 ],
                 consultation: [
-                    "Doctor, I've been taking the medication you prescribed, but I'm experiencing some side effects.",
-                    "I feel dizzy sometimes, especially when I stand up quickly. Is this normal?",
-                    "I'm also having trouble sleeping. Could this be related to the medication?",
-                    "Should I continue taking it, or do you think we should try something else?"
+                    { keywords: ['side effect', 'reaction', 'symptom'], response: "Doctor, I've been taking the medication you prescribed, but I'm experiencing some side effects." },
+                    { keywords: ['dizzy', 'headache', 'lightheaded'], response: "I feel dizzy sometimes, especially when I stand up quickly. Is this normal?" },
+                    { keywords: ['sleep', 'insomnia', 'awake'], response: "I'm also having trouble sleeping. Could this be related to the medication?" },
+                    { keywords: ['stop', 'continue', 'change'], response: "Should I continue taking it, or do you think we should try something else?" },
+                    { keywords: ['better', 'improve', 'work'], response: "My original symptoms are better, but these new side effects are bothering me." }
                 ],
                 research: [
-                    "Thank you for the presentation. Can you elaborate on your inclusion criteria?",
-                    "The results are impressive. How do you plan to address the limitations you mentioned?",
-                    "What's the clinical significance of these findings for everyday practice?",
-                    "Have you considered conducting a larger, multi-center study?"
+                    { keywords: ['criteria', 'inclusion', 'exclusion'], response: "Thank you for the presentation. Can you elaborate on your inclusion criteria?" },
+                    { keywords: ['limitation', 'bias', 'weakness'], response: "The results are impressive. How do you plan to address the limitations you mentioned?" },
+                    { keywords: ['significance', 'clinical', 'practice'], response: "What's the clinical significance of these findings for everyday practice?" },
+                    { keywords: ['study', 'trial', 'future'], response: "Have you considered conducting a larger, multi-center study?" }
                 ],
                 conference: [
-                    "I read your paper with great interest. The methodology was quite innovative.",
-                    "How did you overcome the challenges with patient recruitment?",
-                    "Do you think these results are generalizable to other populations?",
-                    "What are your plans for future research in this area?"
+                    { keywords: ['method', 'innovative', 'approach'], response: "I read your paper with great interest. The methodology was quite innovative." },
+                    { keywords: ['recruit', 'patient', 'sample'], response: "How did you overcome the challenges with patient recruitment?" },
+                    { keywords: ['general', 'population', 'apply'], response: "Do you think these results are generalizable to other populations?" },
+                    { keywords: ['plan', 'next', 'step'], response: "What are your plans for future research in this area?" }
                 ]
             };
             
             const scenarioResponses = responses[scenario] || responses['emergency'];
-            return scenarioResponses[Math.floor(Math.random() * scenarioResponses.length)];
+            
+            // Find matching response
+            for (const item of scenarioResponses) {
+                if (item.keywords.some(k => msg.includes(k))) {
+                    return item.response;
+                }
+            }
+            
+            // Fallbacks based on scenario
+            const fallbacks = {
+                emergency: [
+                    "It really hurts, doctor. Please do something.",
+                    "I'm scared. Is it serious?",
+                    "Can you give me something for the pain?"
+                ],
+                consultation: [
+                    "I'm just not sure if this medication is right for me.",
+                    "What do you recommend I do?",
+                    "Are there any other options?"
+                ],
+                research: [
+                    "That's an interesting point. Can you explain further?",
+                    "I'd like to hear more about your statistical analysis.",
+                    "How does this compare to previous studies?"
+                ],
+                conference: [
+                    "Fascinating work. Congratulations.",
+                    "I have a question about your data analysis.",
+                    "Could you clarify your conclusion?"
+                ]
+            };
+            
+            const specificFallbacks = fallbacks[scenario] || fallbacks['emergency'];
+            return specificFallbacks[Math.floor(Math.random() * specificFallbacks.length)];
         }
 
         function selectScenario(scenario) {
