@@ -576,70 +576,14 @@ const MedEnglishDatabase = {
 
     // Achievements e badges
     achievements: [
-        {
-            id: "first_lesson",
-            name: "First Steps",
-            description: "Complete your first lesson",
-            icon: "🎯",
-            points: 50
-        },
-        {
-            id: "week_streak",
-            name: "Dedicated Learner", 
-            description: "Study for 7 consecutive days",
-            icon: "🔥",
-            points: 200
-        },
-        {
-            id: "vocabulary_master",
-            name: "Vocabulary Master",
-            description: "Learn 100 medical terms",
-            icon: "📚",
-            points: 500
-        },
-        {
-            id: "grammar_expert",
-            name: "Grammar Expert",
-            description: "Score 90% on 10 grammar exercises",
-            icon: "✍️",
-            points: 300
-        },
-        {
-            id: "level_up",
-            name: "Level Up!",
-            description: "Advance to the next CEFR level",
-            icon: "⬆️",
-            points: 1000
-        },
-        // Enhanced Features Achievements
-        {
-            id: "microlearning_master",
-            name: "Micro Master",
-            description: "Complete 10 microlearning sessions",
-            icon: "⚡",
-            points: 200
-        },
-        {
-            id: "conversation_expert",
-            name: "Conversation Expert", 
-            description: "Have 50 AI conversations",
-            icon: "💬",
-            points: 500
-        },
-        {
-            id: "roleplay_champion",
-            name: "Roleplay Champion",
-            description: "Complete 10 roleplay scenarios",
-            icon: "🎭",
-            points: 1000
-        },
-        {
-            id: "photo_analyst",
-            name: "Medical Image Analyst",
-            description: "Analyze 25 medical images",
-            icon: "📸",
-            points: 300
-        }
+        { id: 'first_lesson', name: 'Start Here', description: 'Complete your first lesson', points: 50, icon: '🚀' },
+        { id: 'week_streak', name: 'Week Warrior', description: 'Study for 7 days in a row', points: 150, icon: '🔥' },
+        { id: 'vocabulary_master', name: 'Vocab Master', description: 'Learn 50 new medical terms', points: 100, icon: '📚' },
+        { id: 'microlearning_master', name: 'Micro-Learner', description: 'Complete 10 micro-sessions', points: 100, icon: '⚡' },
+        { id: 'conversation_expert', name: 'Chat Expert', description: '50 messages with AI Doctor', points: 200, icon: '🤖' },
+        { id: 'roleplay_champion', name: 'Roleplay Star', description: 'Complete 10 roleplay scenarios', points: 250, icon: '🎭' },
+        { id: 'photo_analyst', name: 'Photo Analyst', description: 'Describe 25 medical images', points: 200, icon: '📸' },
+        { id: 'premium_supporter', name: 'Premium Member', description: 'Upgrade to Pro', points: 500, icon: '💎' }
     ],
 
     // Suggerimenti personalizzati basati sul progresso
@@ -764,6 +708,9 @@ class MedEnglishApp {
                         break;
                     case 'photo_analyst':
                         earned = (this.currentUser.photo_descriptions || 0) >= 25;
+                        break;
+                    case 'premium_supporter':
+                        earned = localStorage.getItem('isPremiumUser') === 'true';
                         break;
                     // Altri achievements...
                 }
