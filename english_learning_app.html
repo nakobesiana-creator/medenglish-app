@@ -91,13 +91,13 @@
                     
                     <!-- Pulsanti Livello -->
                     <div class="level-buttons-grid">
-                        <button class="btn level-access-btn-styled" onclick="accessGeneralLevel('A2')" id="accessA2">
-                            📖 A2 Foundation
+                        <button class="btn level-access-btn-styled" onclick="selectGeneralLevel('A2')" id="accessA2">
+                            <span class="level-access-icon">🔓</span> Accedi al Livello
                         </button>
-                        <button class="btn level-access-btn-styled level-access-btn-disabled" onclick="accessGeneralLevel('B1')" id="accessB1" disabled>
+                        <button class="btn level-access-btn-styled level-access-btn-disabled" onclick="selectGeneralLevel('B1')" id="accessB1" disabled>
                             🎯 B1 Intermediate
                         </button>
-                        <button class="btn level-access-btn-styled level-access-btn-disabled" onclick="accessGeneralLevel('B2')" id="accessB2" disabled>
+                        <button class="btn level-access-btn-styled level-access-btn-disabled" onclick="selectGeneralLevel('B2')" id="accessB2" disabled>
                             🚀 B2 Advanced
                         </button>
                     </div>
@@ -138,7 +138,7 @@
             <!-- Area Centrale: Lezioni -->
             <div class="lesson-area">
                 <!-- NUOVA SEZIONE: General English A2→B2 -->
-                <div id="general-english" class="lesson-type active">
+                <div id="general-english" class="lesson-type">
                     <h2>🎯 General English Journey - A2 to B2</h2>
                     <div class="medical-context">
                         <h4>🏗️ Costruisci una Base Solida</h4>
@@ -697,7 +697,9 @@
     
     <script src="english_app_data.js"></script>
     <script src="enhanced_features.js"></script>
+    <script src="general_english_data.js"></script>
     <script src="app.js"></script>
+    <script src="general_english_system.js"></script>
     <script>
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
@@ -711,6 +713,13 @@
                     });
             });
         }
+        
+        // Initialize General English System on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initializeGeneralEnglish === 'function') {
+                initializeGeneralEnglish();
+            }
+        });
     </script>
 </body>
 </html>

@@ -16,12 +16,20 @@
         // NUOVO: Sistema di sblocco progressivo B2
         let foundationCompleted = localStorage.getItem('foundationCompleted') === 'true' || false;
         let foundationProgress = parseInt(localStorage.getItem('foundationProgress')) || 0;
-        let currentGeneralLevel = localStorage.getItem('currentGeneralLevel') || 'A2';
-        let generalLevelProgress = JSON.parse(localStorage.getItem('generalLevelProgress')) || {
-            A2: 0, B1: 0, B2: 0
-        };
-        const MEDICAL_ACCESS_LEVEL = 'B2'; // Livello richiesto per accesso medico
-        const MEDICAL_ACCESS_THRESHOLD = 80; // Punteggio minimo B2 per sbloccare medico
+        window.currentGeneralLevel = localStorage.getItem('currentGeneralLevel') || 'A2';
+        window.generalLevelProgress = JSON.parse(localStorage.getItem('generalLevelProgress')) || {
+    A2: 0, B1: 0, B2: 0
+};
+window.generalTopicProgress = JSON.parse(localStorage.getItem('generalTopicProgress')) || {};
+
+// Session state variables for General English
+window.currentGeneralTopic = null;
+let currentGeneralQuestions = [];
+window.currentGeneralQuestionIndex = 0;
+let generalCorrectAnswers = 0;
+
+const MEDICAL_ACCESS_LEVEL = 'B2'; // Livello richiesto per accesso medico
+        window.MEDICAL_ACCESS_THRESHOLD = 80; // Punteggio minimo B2 per sbloccare medico
         
         // PREMIUM SYSTEM
         app.currentUser.subscription = localStorage.getItem('userSubscription') || 'free'; // 'free' or 'premium'
@@ -31,6 +39,181 @@
             
             showPremiumModal(featureName);
             return false;
+        }
+
+        // --- GENERAL ENGLISH LOGIC IMPLEMENTATION ---
+
+        function generateTopicButtons(level) {
+            const container = document.getElementById('topicButtons');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const levelData = GeneralEnglishDatabase[level];
+            if (!levelData) return;
+            
+            Object.keys(levelData.topics).forEach(topicId => {
+                const topic = levelData.topics[topicId];
+                const btn = document.createElement('div');
+                btn.className = 'topic-btn';
+                
+                // Check if completed
+                const progressKey = `${level}-${topicId}`;
+                const isCompleted = (generalTopicProgress[progressKey] || 0) >= 80;
+                
+                btn.innerHTML = `
+                    <div class="topic-icon">${isCompleted ? '✅' : '📝'}</div>
+                    <div class="topic-info">
+                        <div class="topic-title">${topic.title}</div>
+                        <div class="topic-status">${isCompleted ? 'Completed' : 'Start Lesson'}</div>
+                    </div>
+                `;
+                
+                btn.onclick = () => startGeneralTopic(level, topicId);
+                container.appendChild(btn);
+            });
+        }
+
+        function startGeneralTopic(level, topicId) {
+            currentGeneralTopic = topicId;
+            const topicData = GeneralEnglishDatabase[level].topics[topicId];
+            
+            // Randomize questions slightly or take all
+            currentGeneralQuestions = [...topicData.questions];
+            currentGeneralQuestionIndex = 0;
+            generalCorrectAnswers = 0;
+            
+            // UI Update
+            document.getElementById('topicSelection').classList.add('hidden');
+            document.getElementById('questionArea').classList.remove('hidden');
+            document.getElementById('questionArea').style.display = 'block'; // Ensure visibility
+            
+            showGeneralQuestion();
+        }
+
+        function showGeneralQuestion() {
+            const questionData = currentGeneralQuestions[currentGeneralQuestionIndex];
+            
+            const qEl = document.getElementById('generalQuestion');
+            if (qEl) {
+                qEl.innerHTML = `
+                    <h3>Question ${currentGeneralQuestionIndex + 1} / ${currentGeneralQuestions.length}</h3>
+                    <p>${questionData.question}</p>
+                `;
+            }
+            
+            const optionsEl = document.getElementById('generalOptions');
+            if (optionsEl) {
+                optionsEl.innerHTML = '';
+                questionData.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option';
+                    btn.textContent = opt;
+                    btn.onclick = () => checkGeneralAnswer(idx);
+                    optionsEl.appendChild(btn);
+                });
+            }
+            
+            // Reset feedback
+            const feedbackEl = document.getElementById('generalFeedback');
+            if (feedbackEl) {
+                feedbackEl.innerHTML = '';
+                feedbackEl.className = 'feedback';
+            }
+            
+            // Hide Next button initially
+            const nextBtn = document.getElementById('generalNextBtn');
+            if (nextBtn) nextBtn.style.display = 'none';
+        }
+
+        function checkGeneralAnswer(selectedIndex) {
+            const questionData = currentGeneralQuestions[currentGeneralQuestionIndex];
+            const correctIndex = questionData.correct;
+            
+            const options = document.querySelectorAll('#generalOptions .option');
+            
+            // Disable all options
+            options.forEach(btn => btn.disabled = true);
+            
+            const feedbackEl = document.getElementById('generalFeedback');
+            
+            if (selectedIndex === correctIndex) {
+                options[selectedIndex].classList.add('correct');
+                feedbackEl.innerHTML = `<div class="feedback-success">✅ Correct! ${questionData.explanation}</div>`;
+                feedbackEl.className = 'feedback feedback-success';
+                generalCorrectAnswers++;
+            } else {
+                options[selectedIndex].classList.add('wrong');
+                options[correctIndex].classList.add('correct');
+                feedbackEl.innerHTML = `<div class="feedback-error">❌ Incorrect. ${questionData.explanation}</div>`;
+                feedbackEl.className = 'feedback feedback-error';
+            }
+            
+            // Show Next Button
+            const nextBtn = document.getElementById('generalNextBtn');
+            if (nextBtn) nextBtn.style.display = 'block';
+        }
+
+        function nextGeneralQuestion() {
+            currentGeneralQuestionIndex++;
+            
+            if (currentGeneralQuestionIndex < currentGeneralQuestions.length) {
+                showGeneralQuestion();
+            } else {
+                finishGeneralTopic();
+            }
+        }
+
+        function finishGeneralTopic() {
+            const percentage = Math.round((generalCorrectAnswers / currentGeneralQuestions.length) * 100);
+            
+            // Save Progress
+            const progressKey = `${currentGeneralLevel}-${currentGeneralTopic}`;
+            const previousBest = generalTopicProgress[progressKey] || 0;
+            
+            if (percentage > previousBest) {
+                generalTopicProgress[progressKey] = percentage;
+                localStorage.setItem('generalTopicProgress', JSON.stringify(generalTopicProgress));
+            }
+            
+            // Update Level Progress
+            updateGeneralProgress();
+            
+            // Show Completion Screen
+            const container = document.getElementById('questionArea');
+            container.innerHTML = `
+                <div class="completion-screen" style="text-align: center; padding: 20px;">
+                    <h3>🎉 Lesson Completed!</h3>
+                    <div class="score-circle" style="font-size: 2em; color: #2ecc71; margin: 10px 0;">${percentage}%</div>
+                    <p>You got ${generalCorrectAnswers} out of ${currentGeneralQuestions.length} correct.</p>
+                    <button class="btn" style="margin-top: 20px;" onclick="returnToTopics()">Back to Topics</button>
+                </div>
+            `;
+            
+            // Check for level completion (all topics done > 80%)
+            checkMedicalSectionAccess();
+        }
+
+        function returnToTopics() {
+            document.getElementById('questionArea').classList.add('hidden');
+            document.getElementById('questionArea').style.display = 'none';
+            document.getElementById('topicSelection').classList.remove('hidden');
+            
+            // Refresh buttons to show checkmarks
+            generateTopicButtons(currentGeneralLevel);
+            
+            // Restore Question Area structure
+            const qArea = document.getElementById('questionArea');
+            qArea.innerHTML = `
+                <div class="question" id="generalQuestion"></div>
+                <div class="options" id="generalOptions"></div>
+                <div class="feedback" id="generalFeedback"></div>
+                <div class="next-question-btn-container">
+                    <button class="btn next-question-btn" onclick="nextGeneralQuestion()" id="generalNextBtn">
+                        Prossima Domanda ➡️
+                    </button>
+                </div>
+            `;
         }
 
         function showPremiumModal(featureName) {
@@ -113,7 +296,7 @@
         }
         
         // NUOVO: Database General English Completo (A2→B2)
-        const GeneralEnglishDatabase = {
+        window.GeneralEnglishDatabase = {
             A2: {
                 name: "Elementary English",
                 description: "Fondamenti della comunicazione inglese",
@@ -220,6 +403,41 @@
                                 options: ["Bye!", "See ya!", "Goodbye", "Later!"],
                                 correct: 2,
                                 explanation: "'Goodbye' is the most formal way to say farewell."
+                            }
+                        ]
+                    },
+                    'body-parts': {
+                        title: 'Body Parts',
+                        questions: [
+                            {
+                                question: "Which organ pumps blood around the body?",
+                                options: ["Brain", "Lungs", "Heart", "Stomach"],
+                                correct: 2,
+                                explanation: "The heart is the muscular organ that pumps blood."
+                            },
+                            {
+                                question: "What do you use to see?",
+                                options: ["Ears", "Eyes", "Nose", "Mouth"],
+                                correct: 1,
+                                explanation: "Eyes are the organs of vision."
+                            },
+                            {
+                                question: "Which part of the body connects the head to the shoulders?",
+                                options: ["Neck", "Back", "Arm", "Leg"],
+                                correct: 0,
+                                explanation: "The neck connects the head to the rest of the body."
+                            },
+                            {
+                                question: "What do you have ten of on your hands?",
+                                options: ["Toes", "Fingers", "Elbows", "Knees"],
+                                correct: 1,
+                                explanation: "We have five fingers on each hand, ten in total."
+                            },
+                            {
+                                question: "What covers the entire body?",
+                                options: ["Hair", "Skin", "Muscle", "Bone"],
+                                correct: 1,
+                                explanation: "Skin is the largest organ and covers the entire body."
                             }
                         ]
                     }
@@ -333,6 +551,41 @@
                                 explanation: "'Excuse me, may I add' is polite and professional."
                             }
                         ]
+                    },
+                    'medical-departments': {
+                        title: 'Medical Departments',
+                        questions: [
+                            {
+                                question: "Where do you go for X-rays?",
+                                options: ["Radiology", "Cardiology", "Neurology", "Pediatrics"],
+                                correct: 0,
+                                explanation: "Radiology is the department for X-rays and imaging."
+                            },
+                            {
+                                question: "Which department treats children?",
+                                options: ["Geriatrics", "Pediatrics", "Oncology", "Psychiatry"],
+                                correct: 1,
+                                explanation: "Pediatrics specializes in medical care for children."
+                            },
+                            {
+                                question: "Where are surgeries performed?",
+                                options: ["Pharmacy", "Operating Theatre", "Cafeteria", "Reception"],
+                                correct: 1,
+                                explanation: "Operating Theatre (OR) is where surgeries take place."
+                            },
+                            {
+                                question: "Which department deals with the heart?",
+                                options: ["Cardiology", "Dermatology", "Urology", "Orthopedics"],
+                                correct: 0,
+                                explanation: "Cardiology specializes in heart conditions."
+                            },
+                            {
+                                question: "Where do you go for emergency treatment?",
+                                options: ["ICU", "ER / A&E", "OPD", "Lab"],
+                                correct: 1,
+                                explanation: "ER (Emergency Room) or A&E (Accident and Emergency) is for emergencies."
+                            }
+                        ]
                     }
                 }
             },
@@ -444,15 +697,47 @@
                                 explanation: "This balances recognition with specific improvement suggestions."
                             }
                         ]
+                    },
+                    'patient-history': {
+                        title: 'Taking Patient History',
+                        questions: [
+                            {
+                                question: "How do you ask about the onset of pain?",
+                                options: ["When did it start?", "Start time?", "Pain begin?", "Now?"],
+                                correct: 0,
+                                explanation: "'When did it start?' is a clear and direct question for onset."
+                            },
+                            {
+                                question: "How do you ask about family history?",
+                                options: ["Your family sick?", "Do any diseases run in your family?", "Family problems?", "Parents ill?"],
+                                correct: 1,
+                                explanation: "'Do any diseases run in your family?' is the standard way to ask."
+                            },
+                            {
+                                question: "What does 'SOCRATES' stand for in pain assessment?",
+                                options: ["Site, Onset, Character, Radiation...", "Severity Only", "Site Of Care...", "Symptoms Of..."],
+                                correct: 0,
+                                explanation: "SOCRATES is a mnemonic for pain assessment (Site, Onset, Character, Radiation, Associations, Time, Exacerbating/Relieving factors, Severity)."
+                            },
+                            {
+                                question: "How do you ask about allergies?",
+                                options: ["You allergic?", "Do you have any known allergies?", "Allergy yes no?", "Drugs?"],
+                                correct: 1,
+                                explanation: "'Do you have any known allergies?' is professional and comprehensive."
+                            },
+                            {
+                                question: "What is 'social history'?",
+                                options: ["Facebook", "Lifestyle factors like smoking and alcohol", "Friends", "Parties"],
+                                correct: 1,
+                                explanation: "Social history covers lifestyle factors that affect health."
+                            }
+                        ]
                     }
                 }
             }
         };
         
-        // Tracciamento progresso per livelli generali
-        let generalTopicProgress = JSON.parse(localStorage.getItem('generalTopicProgress')) || {};
-        let currentGeneralTopic = null;
-        let currentGeneralQuestionIndex = 0;
+        // Tracciamento progresso per livelli generali (Moved to top)
         
         // Popola il dizionario con tutti i livelli
         Object.keys(MedEnglishDatabase.vocabulary).forEach(level => {
@@ -1923,15 +2208,8 @@
         function startMicrolearning() {
             microlearningActive = true;
 
-            // Integrate Enhanced Features
-            if (typeof EnhancedMedEnglishFeatures !== 'undefined') {
-                const level = currentGeneralLevel || 'A2';
-                const modules = EnhancedMedEnglishFeatures.microlearningModules[level];
-                if (modules && modules.length > 0) {
-                    const randomModule = modules[Math.floor(Math.random() * modules.length)];
-                    showMicrolearningModule(randomModule);
-                }
-            }
+            // Use the centralized loading function
+            loadNextMicrolearningModule();
 
             microlearningTimer = setInterval(() => {
                 microlearningTimeLeft--;
@@ -1974,6 +2252,16 @@
                          contentHtml += `<div class="microlearning-quiz-container">
                             <p><strong>Flashcards:</strong> ${item.terms.join(', ')}</p>
                          </div>`;
+                     } else if (item.type === 'matching') {
+                        contentHtml += `<div class="microlearning-quiz-container">
+                           <p><strong>Match the pairs:</strong></p>
+                           <div class="matching-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                               ${item.pairs.map(pair => `
+                                   <div class="matching-item" style="border:1px solid #ddd; padding:5px; border-radius:4px;">${pair[0]}</div>
+                                   <div class="matching-item" style="border:1px solid #ddd; padding:5px; border-radius:4px;">${pair[1]}</div>
+                               `).join('')}
+                           </div>
+                        </div>`;
                      } else if (item.type === 'scenario') {
                         contentHtml += `<div class="microlearning-quiz-container">
                            <p><strong>Scenario:</strong> ${item.situation}</p>
@@ -1983,20 +2271,78 @@
                  });
              }
              
-             contentHtml += `<button class="btn microlearning-close-btn" onclick="document.getElementById('microlearning-content').remove()">Chiudi</button>`;
+             // Check if session is active OR timer is running to decide which buttons to show
+             // This is a safety check because sometimes microlearningActive might be out of sync
+             if (microlearningActive || microlearningTimer) {
+                 contentHtml += `<div class="microlearning-actions">`;
+                 contentHtml += `<button class="btn btn-primary microlearning-next-btn" onclick="loadNextMicrolearningModule()">Next Activity ➡️</button>`;
+                 contentHtml += `<button class="btn btn-secondary microlearning-close-btn" onclick="pauseMicrolearning(); document.getElementById('microlearning-content').remove()">Pause & Close</button>`;
+                 contentHtml += `</div>`;
+             } else {
+                 contentHtml += `<button class="btn microlearning-close-btn" onclick="document.getElementById('microlearning-content').remove()">Chiudi</button>`;
+             }
              
              container.innerHTML = contentHtml;
              document.body.appendChild(container);
         }
 
+        window.loadNextMicrolearningModule = function() {
+            console.log("Loading next microlearning module...");
+            
+            // Fix: Ensure session is active if we are loading content
+            // This prevents the "Close" button from appearing instead of "Next"
+            if (!microlearningActive) {
+                console.warn("microlearningActive was false, forcing to true to show navigation buttons.");
+                microlearningActive = true;
+                
+                // Also ensure timer is running if it's not
+                if (!microlearningTimer) {
+                     microlearningTimer = setInterval(() => {
+                        microlearningTimeLeft--;
+                        updateTimerDisplay();
+                        
+                        if (microlearningTimeLeft <= 0) {
+                            completeMicrolearning();
+                        }
+                    }, 1000);
+                }
+            }
+
+            if (typeof EnhancedMedEnglishFeatures !== 'undefined') {
+                const level = currentGeneralLevel || 'A2';
+                console.log("Current level for microlearning:", level);
+                const modules = EnhancedMedEnglishFeatures.microlearningModules[level];
+                
+                if (modules && modules.length > 0) {
+                    const randomModule = modules[Math.floor(Math.random() * modules.length)];
+                    console.log("Selected module:", randomModule.title);
+                    showMicrolearningModule(randomModule);
+                } else {
+                    console.error("No modules found for level:", level);
+                    alert("No microlearning modules found for this level (" + level + "). Please try a different level.");
+                    pauseMicrolearning();
+                }
+            } else {
+                console.error("EnhancedMedEnglishFeatures is undefined!");
+                alert("Error: Enhanced features not loaded. Please refresh the page.");
+            }
+        };
+
         // Rendiamo la funzione globale per l'onclick
         window.checkMicroAnswer = function(selected, correct, btn) {
             if (selected === correct) {
                 btn.classList.add('btn-correct');
-                // alert('Correct!'); 
+                
+                // Add visual feedback
+                const originalText = btn.textContent;
+                btn.innerHTML = `${originalText} ✅`;
+                
+                // Auto advance after short delay
+                setTimeout(() => {
+                    loadNextMicrolearningModule();
+                }, 1000);
             } else {
                 btn.classList.add('btn-wrong');
-                // alert('Try again');
             }
         };
 
@@ -2756,6 +3102,10 @@
             });
         }
 
+        function showLevelAccessDenied(level, prevLevel, progress) {
+            showMicrolearningNotification(`🔒 Level ${level} is locked. Complete ${prevLevel} (Current: ${progress}%) first.`, "error");
+        }
+
         // Seleziona un livello generale
         function selectGeneralLevel(level) {
             // Controlla se il livello è accessibile
@@ -2776,6 +3126,10 @@
             
             // Mostra contenuto del livello
             document.getElementById('levelContent').classList.remove('hidden');
+            
+            // Reset visibility for topic selection
+            document.getElementById('topicSelection').classList.remove('hidden');
+            document.getElementById('questionArea').style.display = 'none';
             
             const levelData = GeneralEnglishDatabase[level];
             document.getElementById('selectedLevelTitle').textContent = `${level} - ${levelData.name}`;
