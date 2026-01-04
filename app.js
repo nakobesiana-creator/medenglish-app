@@ -2637,7 +2637,7 @@
                 medicalSection.querySelector('h5').textContent = `🏥 Medical English (Richiede B2 ${MEDICAL_ACCESS_THRESHOLD}%)`;
                 
                 if (statusDiv) {
-                    statusDiv.innerHTML = `🔒 Completa B2 General English (${b2Progress}/${MEDICAL_ACCESS_THRESHOLD}%) <br> <span style="font-size:0.9em;color:#ffd700;cursor:pointer" onclick="showPremiumModal()">oppure 👑 Passa a Premium</span>`;
+                    statusDiv.innerHTML = `🔒 Completa B2 General English (${b2Progress}/${MEDICAL_ACCESS_THRESHOLD}%) <br> <span class="text-gold cursor-pointer text-sm" onclick="showPremiumModal()">oppure 👑 Passa a Premium</span>`;
                     statusDiv.className = 'medical-lock-msg medical-section-locked-status';
                 }
             }
@@ -2701,11 +2701,11 @@
             if (!modal) {
                 modal = document.createElement('div');
                 modal.id = 'premiumModal';
-                modal.className = 'premium-modal-overlay';
+                modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;';
                 
                 modal.innerHTML = `
-                    <div class="premium-modal-wrapper">
-                        <button class="modal-close-btn-styled" onclick="closePremiumModal()">✕</button>
+                    <div class="premium-modal" style="background:white;padding:30px;border-radius:20px;max-width:400px;width:90%;position:relative;">
+                        <button class="modal-close-btn" style="position:absolute;top:15px;right:15px;font-size:20px;text-decoration:none;" onclick="closePremiumModal()">✕</button>
                         
                         <div class="premium-icon">👑</div>
                         <h2 class="premium-title">Diventa un MedEnglish Pro</h2>
@@ -2722,7 +2722,7 @@
                         <button class="btn-premium-action" onclick="activatePremium()">
                             Sblocca Tutto a soli $9.99/mese
                         </button>
-                        <p class="premium-guarantee-text">Garanzia soddisfatti o rimborsati di 30 giorni</p>
+                        <p style="font-size:0.8em;color:#999;margin-top:10px;">Garanzia soddisfatti o rimborsati di 30 giorni</p>
                     </div>
                 `;
                 document.body.appendChild(modal);
@@ -2741,14 +2741,6 @@
             alert('🎉 Complimenti! Ora sei un utente PREMIUM!\nTutte le funzioni sono sbloccate.');
             closePremiumModal();
             updateSubscriptionUI();
-            
-            // Trigger achievement check
-            if (typeof app !== 'undefined' && app.checkAchievements) {
-                 const newAchievements = app.checkAchievements();
-                 if (newAchievements.length > 0) {
-                     showAchievements(newAchievements);
-                 }
-            }
         }
 
         function updateSubscriptionUI() {

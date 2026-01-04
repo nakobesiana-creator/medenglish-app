@@ -709,9 +709,6 @@ class MedEnglishApp {
                     case 'photo_analyst':
                         earned = (this.currentUser.photo_descriptions || 0) >= 25;
                         break;
-                    case 'premium_supporter':
-                        earned = localStorage.getItem('isPremiumUser') === 'true';
-                        break;
                     // Altri achievements...
                 }
                 

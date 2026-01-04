@@ -2114,3 +2114,5 @@ button, .btn {
 .dashboard-header-links {
     margin-top: 20px;
 }
+
+.text-sm { font-size: 0.9em; }
