@@ -564,6 +564,14 @@
                 currentGrammarIndex++;
                 showNextGrammarQuestion();
             });
+
+            // Auto-advance after 3 seconds if correct
+            if (isCorrect) {
+                setTimeout(() => {
+                    currentGrammarIndex++;
+                    showNextGrammarQuestion();
+                }, 3000);
+            }
         }
         
         function showFeedbackWithNext(message, type, nextCallback) {
@@ -918,6 +926,13 @@
             showFeedbackWithNext(msg, type, () => {
                 nextReading();
             });
+
+            // Auto-advance after 3 seconds if correct
+            if (isCorrect) {
+                setTimeout(() => {
+                    nextReading();
+                }, 3000);
+            }
         }
         
         function showFeedback(message, type) {
