@@ -2676,28 +2676,74 @@
             });
         }
 
-        // Mostra notifica sezione medica sbloccata
-        function showMedicalUnlockedNotification() {
-            const notification = document.createElement('div');
-            notification.className = 'unlocked-notification';
+        // PREMIUM MOCK LOGIC
+        function checkPremiumAccess(featureName) {
+            const isPremium = localStorage.getItem('isPremiumUser') === 'true';
+            if (isPremium) return true;
+
+            showPremiumModal(featureName);
+            return false;
+        }
+
+        function showPremiumModal(source) {
+            // Crea modale se non esiste
+            let modal = document.getElementById('premiumModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'premiumModal';
+                modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;';
+                
+                modal.innerHTML = `
+                    <div class="premium-modal" style="background:white;padding:30px;border-radius:20px;max-width:400px;width:90%;position:relative;">
+                        <button class="modal-close-btn" style="position:absolute;top:15px;right:15px;font-size:20px;text-decoration:none;" onclick="closePremiumModal()">✕</button>
+                        
+                        <div class="premium-icon">👑</div>
+                        <h2 class="premium-title">Diventa un MedEnglish Pro</h2>
+                        <p class="premium-text">Supera l'esame OET e lavora all'estero!</p>
+                        
+                        <ul class="premium-features-list">
+                            <li>🤖 <strong>AI Medical Chat:</strong> Simulazioni illimitate</li>
+                            <li>🎭 <strong>Roleplay Clinico:</strong> Scenari paziente-dottore</li>
+                            <li>📸 <strong>Photo Analysis:</strong> Descrivi casi reali</li>
+                            <li>🎓 <strong>Certificato OET/IELTS:</strong> Preparazione esami</li>
+                            <li>📈 <strong>Statistiche Avanzate:</strong> Monitora i progressi</li>
+                        </ul>
+                        
+                        <button class="btn-premium-action" onclick="activatePremium()">
+                            Sblocca Tutto a soli $9.99/mese
+                        </button>
+                        <p style="font-size:0.8em;color:#999;margin-top:10px;">Garanzia soddisfatti o rimborsati di 30 giorni</p>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } else {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closePremiumModal() {
+            const modal = document.getElementById('premiumModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function activatePremium() {
+            localStorage.setItem('isPremiumUser', 'true');
+            alert('🎉 Complimenti! Ora sei un utente PREMIUM!\nTutte le funzioni sono sbloccate.');
+            closePremiumModal();
+            updateSubscriptionUI();
+        }
+
+        function updateSubscriptionUI() {
+            const isPremium = localStorage.getItem('isPremiumUser') === 'true';
+            const badge = document.getElementById('subscriptionStatus');
+            const locks = document.querySelectorAll('.premium-lock-icon');
             
-            notification.innerHTML = `
-                <div class="unlocked-icon">🏥</div>
-                <h2 class="unlocked-title">Medical English Sbloccato!</h2>
-                <p class="unlocked-text">
-                    Hai raggiunto il <strong>B2</strong>! Ora puoi accedere ai contenuti medici specializzati!
-                </p>
-                <p class="unlocked-subtext">
-                    Grammatica medica, vocabolario clinico, conversazioni AI, roleplay medici e molto altro ti aspettano!
-                </p>
-                <button onclick="this.parentElement.remove(); showLesson('vocabulary')" class="unlocked-start-btn">
-                    🚀 Inizia Sezione Medica
-                </button>
-                <button onclick="this.parentElement.remove()" class="unlocked-later-btn">
-                    Continua Più Tardi
-                </button>
-            `;
-            
-            document.body.appendChild(notification);
+            if (isPremium) {
+                if (badge) {
+                    badge.textContent = 'PRO Member 👑';
+                    badge.className = 'badge badge-premium';
+                }
+                locks.forEach(lock => lock.style.display = 'none');
+            }
         }
 
