@@ -331,6 +331,9 @@ function loadGeneralTopic(level, topicId) {
 
 // Carica una domanda generale
 function loadGeneralQuestion() {
+    console.log('loadGeneralQuestion called');
+    console.log('Level:', window.currentGeneralLevel, 'Topic:', window.currentGeneralTopic, 'Index:', window.currentGeneralQuestionIndex);
+    
     if (!window.currentGeneralLevel || !window.currentGeneralTopic) {
         console.error('No level or topic selected');
         return;
@@ -339,7 +342,10 @@ function loadGeneralQuestion() {
     const topic = window.GeneralEnglishDatabase[window.currentGeneralLevel].topics[window.currentGeneralTopic];
     const question = topic.questions[window.currentGeneralQuestionIndex];
     
+    console.log('Question:', question);
+    
     if (!question) {
+        console.log('No more questions, completing topic');
         completeGeneralTopic();
         return;
     }
@@ -422,7 +428,10 @@ function showGeneralFeedback(message, type) {
 
 // Prossima domanda generale
 function nextGeneralQuestion() {
+    console.log('nextGeneralQuestion called');
+    console.log('Current index before:', window.currentGeneralQuestionIndex);
     window.currentGeneralQuestionIndex++;
+    console.log('Current index after:', window.currentGeneralQuestionIndex);
     loadGeneralQuestion();
 }
 
