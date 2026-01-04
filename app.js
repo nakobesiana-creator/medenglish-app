@@ -8,6 +8,11 @@
         let wordsLearned = app.currentUser.totalPoints / 10 || 342;
         let lessonsCompleted = app.currentUser.progress || 28;
         
+        // Indici per le lezioni attive
+        let currentGrammarIndex = 0;
+        let currentVocabularyIndex = 0;
+        let currentReadingIndex = 0;
+        
         // NUOVO: Sistema di sblocco progressivo B2
         let foundationCompleted = localStorage.getItem('foundationCompleted') === 'true' || false;
         let foundationProgress = parseInt(localStorage.getItem('foundationProgress')) || 0;
@@ -486,17 +491,33 @@
         
         // Carica contenuto grammatica per il livello corrente
         function loadGrammarContent() {
+            currentGrammarIndex = 0;
+            showNextGrammarQuestion();
+        }
+        
+        function showNextGrammarQuestion() {
             const grammarContent = app.getContentForLevel('grammar', currentLevel);
-            if (grammarContent.length > 0) {
-                const currentQuestion = grammarContent[0];
-                updateGrammarQuestion(currentQuestion);
+            
+            if (currentGrammarIndex >= grammarContent.length) {
+                showLessonComplete('Grammar Lesson');
+                return;
             }
+            
+            const currentQuestion = grammarContent[currentGrammarIndex];
+            updateGrammarQuestion(currentQuestion);
         }
         
         function updateGrammarQuestion(question) {
             const grammarSection = document.getElementById('grammar');
             const questionDiv = grammarSection.querySelector('.question');
             const optionsDiv = grammarSection.querySelector('.options');
+            
+            // Reset feedback
+            const feedback = grammarSection.querySelector('.feedback');
+            if (feedback) {
+                feedback.className = 'feedback hidden-element';
+                feedback.innerHTML = '';
+            }
             
             questionDiv.innerHTML = `
                 <h3>${question.title}</h3>
@@ -517,9 +538,13 @@
             const options = element.parentNode.querySelectorAll('.option');
             options.forEach(opt => opt.disabled = true);
             
+            let feedbackMsg = '';
+            let feedbackType = '';
+            
             if (isCorrect) {
                 element.classList.add('correct');
-                showFeedback(`Corretto! 🎉 ${explanation}`, 'success');
+                feedbackMsg = `Corretto! 🎉 ${explanation}`;
+                feedbackType = 'success';
                 app.calculateScore('grammar', true);
                 wordsLearned += 2;
                 updateProgress();
@@ -530,18 +555,62 @@
                         opt.classList.add('correct');
                     }
                 });
-                showFeedback(`Non è corretto. ${explanation}`, 'error');
+                feedbackMsg = `Non è corretto. ${explanation}`;
+                feedbackType = 'error';
                 app.calculateScore('grammar', false);
             }
+            
+            showFeedbackWithNext(feedbackMsg, feedbackType, () => {
+                currentGrammarIndex++;
+                showNextGrammarQuestion();
+            });
+        }
+        
+        function showFeedbackWithNext(message, type, nextCallback) {
+            const activeLesson = document.querySelector('.lesson-type.active');
+            const feedback = activeLesson.querySelector('.feedback');
+            
+            feedback.innerHTML = `
+                <p>${message}</p>
+                <button class="btn btn-primary mt-10" id="nextQuestionBtn">Next Question ➡️</button>
+            `;
+            feedback.className = `feedback ${type} active`;
+            
+            document.getElementById('nextQuestionBtn').onclick = nextCallback;
+        }
+
+        function showLessonComplete(lessonName) {
+            const activeLesson = document.querySelector('.lesson-type.active');
+            activeLesson.innerHTML = `
+                <div class="lesson-complete text-center">
+                    <div class="complete-icon">🎉</div>
+                    <h2>${lessonName} Completed!</h2>
+                    <p>Great job! You've finished all questions in this section.</p>
+                    <p>+50 Bonus Points</p>
+                    <button class="btn btn-primary mt-20" onclick="location.reload()">Back to Dashboard</button>
+                </div>
+            `;
+            app.currentUser.totalPoints += 50;
+            app.saveUserData();
+            updateProgress();
         }
         
         // Carica contenuto vocabolario
         function loadVocabularyContent() {
+            currentVocabularyIndex = 0;
+            showNextVocabularyTerm();
+        }
+        
+        function showNextVocabularyTerm() {
             const vocabContent = app.getContentForLevel('vocabulary', currentLevel);
-            if (vocabContent.length > 0) {
-                const currentTerm = vocabContent[0];
-                updateVocabularyQuestion(currentTerm);
+            
+            if (currentVocabularyIndex >= vocabContent.length) {
+                showLessonComplete('Vocabulary Session');
+                return;
             }
+            
+            const currentTerm = vocabContent[currentVocabularyIndex];
+            updateVocabularyQuestion(currentTerm);
         }
         
         function updateVocabularyQuestion(term) {
@@ -560,21 +629,45 @@
                 <h4>📖 Esempio in Contesto</h4>
                 <p><em>"${term.example}"</em></p>
                 <p><strong>Categoria:</strong> ${term.category}</p>
+                <button class="btn btn-primary mt-10 w-100" onclick="nextVocabularyTerm()">Next Word ➡️</button>
             `;
+        }
+        
+        function nextVocabularyTerm() {
+            currentVocabularyIndex++;
+            wordsLearned += 1;
+            updateProgress();
+            showNextVocabularyTerm();
         }
         
         // Carica contenuto reading
         function loadReadingContent() {
+            currentReadingIndex = 0;
+            showNextReading();
+        }
+        
+        function showNextReading() {
             const readingContent = app.getContentForLevel('reading', currentLevel);
-            if (readingContent.length > 0) {
-                const currentReading = readingContent[0];
-                updateReadingContent(currentReading);
+            
+            if (currentReadingIndex >= readingContent.length) {
+                showLessonComplete('Reading Session');
+                return;
             }
+            
+            const currentReading = readingContent[currentReadingIndex];
+            updateReadingContent(currentReading);
         }
         
         function updateReadingContent(reading) {
             const readingSection = document.getElementById('reading');
             const questionDivs = readingSection.querySelectorAll('.question');
+            
+            // Reset feedback
+            const feedback = readingSection.querySelector('.feedback');
+            if (feedback) {
+                feedback.className = 'feedback hidden-element';
+                feedback.innerHTML = '';
+            }
             
             // Aggiorna il testo
             questionDivs[0].innerHTML = `
@@ -597,6 +690,11 @@
                     optionsDiv.appendChild(button);
                 });
             }
+        }
+        
+        function nextReading() {
+            currentReadingIndex++;
+            showNextReading();
         }
         
         // Carica contenuto writing
@@ -796,9 +894,13 @@
             const options = element.parentNode.querySelectorAll('.option');
             options.forEach(opt => opt.disabled = true);
             
+            let msg = '';
+            let type = '';
+            
             if (isCorrect) {
                 element.classList.add('correct');
-                showFeedback('Corretto! Ottimo lavoro! 🎉', 'success');
+                msg = 'Corretto! Ottimo lavoro! 🎉';
+                type = 'success';
                 wordsLearned += 2;
                 updateProgress();
             } else {
@@ -809,8 +911,13 @@
                         opt.classList.add('correct');
                     }
                 });
-                showFeedback('Non è corretto. Studia la spiegazione e riprova! 📚', 'error');
+                msg = 'Non è corretto. Riprova! 📚';
+                type = 'error';
             }
+            
+            showFeedbackWithNext(msg, type, () => {
+                nextReading();
+            });
         }
         
         function showFeedback(message, type) {
